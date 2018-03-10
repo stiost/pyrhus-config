@@ -25,7 +25,7 @@ class ConfigLoaderTest {
             override(property("discarded", "123"))
         }
         assertThat(config.getString("message")).isEqualTo("overridden")
-        assertThat(config.contains("discared")).isFalse()
+        assertThat("discared" in config).isFalse()
     }
 
     @Test

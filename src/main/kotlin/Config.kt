@@ -5,7 +5,7 @@ class Config(private val map: Map<String, Property>) {
         return map[key] ?: throw ConfigException()
     }
 
-    fun contains(key: String) = map.contains(key)
+    operator fun contains(key: String) = key in map
 }
 
 data class Property(val key: String, val value: String, val secret: Boolean = false) {
