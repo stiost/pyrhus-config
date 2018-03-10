@@ -2,7 +2,7 @@ package org.pyrhus.config
 
 data class Config(private val map: Map<String, Property>) {
     operator fun get(key: String): Property {
-        return map[key] ?: throw ConfigException()
+        return map[key] ?: throw ConfigException("Configuration key '$key' not found")
     }
 
     operator fun contains(key: String) = key in map
@@ -18,4 +18,4 @@ data class Property(val key: String, val value: String, val secret: Boolean = fa
     }
 }
 
-class ConfigException() : Exception()
+class ConfigException(message: String) : Exception(message)

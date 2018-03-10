@@ -1,6 +1,7 @@
 package org.pyrhus.config
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.*
 
 class ConfigLoaderTest {
@@ -65,6 +66,17 @@ class ConfigLoaderTest {
             add(property("password", "hunter2", secret = true))
         }
         assertThat(config.toString()).doesNotContain("hunter2")
+    }
+
+    @Test
+    fun testKeyNotFound() {
+        val config = loadConfig {
+        }
+        assertThat("message" in config).isFalse()
+
+        assertThatThrownBy { config["message"] }
+            .hasMessage("Configuration key 'message' not found")
+            .isInstanceOf(ConfigException::class.java)
     }
 
 }
