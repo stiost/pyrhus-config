@@ -7,5 +7,3 @@ fun Property.asBoolean() = this.value.toBoolean()
 fun Config.getString(key: String) = this[key].asString()
 fun Config.getInt(key: String) = this[key].asInt()
 fun Config.getBoolean(key: String) = this[key].asBoolean()
-
-fun ConfigWriter.submit(key: String, value: String) = this.submit(Property(key, value))

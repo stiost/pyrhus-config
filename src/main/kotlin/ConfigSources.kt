@@ -22,3 +22,27 @@ fun sysProps(properties: Properties = System.getProperties()): ConfigSource {
         }
     }
 }
+
+fun propertiesResource(classpath: String): ConfigSource {
+    val opener = resourceOpener(classpath)
+    return { writer -> PropertiesReader(opener).read(writer) }
+}
+
+class PropertiesReader(private val opener: ReaderOpener) {
+    val secretPrefix = "secret."
+
+    fun read(writer: ConfigWriter) {
+        opener().use { reader ->
+            val properties = Properties()
+            properties.load(reader)
+            for (key in properties.stringPropertyNames()) {
+                val value = properties.getProperty(key).takeIf { !it.isNullOrBlank() }
+                if (key.startsWith(secretPrefix)) {
+                    writer.submit(key.substring(secretPrefix.length), value, true)
+                } else {
+                    writer.submit(key, value)
+                }
+            }
+        }
+    }
+}

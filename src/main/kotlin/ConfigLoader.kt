@@ -18,6 +18,7 @@ fun loadConfig(block: ConfigLoader.() -> Unit): Config = configLoader(block).loa
 
 interface ConfigWriter {
     fun submit(property: Property)
+    fun submit(key: String?, value: String?, secret: Boolean = false)
 }
 
 typealias ConfigSource = (ConfigWriter) -> Unit
@@ -38,6 +39,12 @@ private class Writer(val map: MutableMap<String, Property>, val override: Boolea
             return property.asSecret()
         }
         return property
+    }
+
+    override fun submit(key: String?, value: String?, secret: Boolean) {
+        if (key != null && value != null) {
+            submit(Property(key, value, secret))
+        }
     }
 
 }

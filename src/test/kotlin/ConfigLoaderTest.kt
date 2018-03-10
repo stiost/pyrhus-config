@@ -79,4 +79,15 @@ class ConfigLoaderTest {
             .isInstanceOf(ConfigException::class.java)
     }
 
+    @Test
+    fun testLoadPropertiesResource() {
+        val config = loadConfig {
+            add(propertiesResource("test.properties"))
+        }
+        assertThat(config.getString("my.message")).isEqualTo("hello")
+        val password = config["password"]
+        assertThat(password.secret).isTrue()
+        assertThat(password.value).isEqualTo("hunter2")
+    }
+
 }
