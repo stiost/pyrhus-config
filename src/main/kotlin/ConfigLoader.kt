@@ -3,8 +3,8 @@ package org.pyrhus.config
 class ConfigLoader {
     private val delegates = mutableListOf<MapWriter>()
 
-    fun add(source: ConfigSource) = delegates.add({ map -> source.load(Writer(map, false)) })
-    fun override(source: ConfigSource) = delegates.add({ map -> source.load(Writer(map, true)) })
+    fun add(source: ConfigSource) = delegates.add({ map -> source(Writer(map, false)) })
+    fun override(source: ConfigSource) = delegates.add({ map -> source(Writer(map, true)) })
 
     internal fun load(): Config {
         val map = mutableMapOf<String, Property>()
@@ -20,9 +20,7 @@ interface ConfigWriter {
     fun submit(property: Property)
 }
 
-interface ConfigSource {
-    fun load(writer: ConfigWriter)
-}
+typealias ConfigSource = (ConfigWriter) -> Unit
 
 private typealias MapWriter = (MutableMap<String, Property>) -> Unit
 
