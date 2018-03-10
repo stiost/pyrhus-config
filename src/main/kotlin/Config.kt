@@ -1,6 +1,6 @@
 package org.pyrhus.config
 
-class Config(private val map: Map<String, Property>) {
+data class Config(private val map: Map<String, Property>) {
     operator fun get(key: String): Property {
         return map[key] ?: throw ConfigException()
     }

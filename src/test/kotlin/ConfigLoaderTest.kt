@@ -33,11 +33,14 @@ class ConfigLoaderTest {
         val loader = configLoader {
             add(property("message", "hello"))
         }
-        loader.load()
+        val config1 = loader.load()
+        val config2 = loader.load()
+        assertThat(config1 == config2).isTrue()
+        assertThat(config1 === config2).isFalse()
     }
 
     @Test
-    fun testEnv() {
+    fun testLoadEnv() {
         val env = mapOf("MY_MESSAGE" to "overridden")
         val config = loadConfig {
             add(property("my.message", "hello"))
@@ -47,13 +50,21 @@ class ConfigLoaderTest {
     }
 
     @Test
-    fun testProperties() {
+    fun testLoadSystemProperties() {
         System.setProperty("my.message", "overridden")
         val config = loadConfig {
             add(property("my.message", "hello"))
             override(sysProps())
         }
         assertThat(config.getString("my.message")).isEqualTo("overridden")
+    }
+
+    @Test
+    fun testToStringDoesNotPrintSecrets() {
+        val config = loadConfig {
+            add(property("password", "hunter2", secret = true))
+        }
+        assertThat(config.toString()).doesNotContain("hunter2")
     }
 
 }

@@ -2,10 +2,10 @@ package org.pyrhus.config
 
 import java.util.*
 
-fun property(name: String, value: String): ConfigSource {
+fun property(name: String, value: String, secret: Boolean = false): ConfigSource {
     return object : ConfigSource {
         override fun load(writer: ConfigWriter) {
-            writer.submit(Property(name, value))
+            writer.submit(Property(name, value, secret))
         }
     }
 }
