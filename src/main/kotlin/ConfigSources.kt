@@ -1,5 +1,7 @@
 package org.pyrhus.config
 
+import java.nio.charset.*
+import java.nio.file.*
 import java.util.*
 
 fun property(name: String, value: String, secret: Boolean = false): ConfigSource {
@@ -25,6 +27,13 @@ fun sysProps(properties: Properties = System.getProperties()): ConfigSource {
 
 fun propertiesResource(classpath: String): ConfigSource {
     val opener = resourceOpener(classpath)
+    return { writer -> PropertiesReader(opener).read(writer) }
+}
+
+fun propertiesFile(file: String) = propertiesFile(Paths.get(file))
+
+fun propertiesFile(file: Path): ConfigSource {
+    val opener = { Files.newBufferedReader(file, StandardCharsets.UTF_8) }
     return { writer -> PropertiesReader(opener).read(writer) }
 }
 

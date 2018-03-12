@@ -90,4 +90,15 @@ class ConfigLoaderTest {
         assertThat(password.value).isEqualTo("hunter2")
     }
 
+    @Test
+    fun testLoadPropertiesFile() {
+        val config = loadConfig {
+            add(propertiesFile("src/test/resources/test.properties"))
+        }
+        assertThat(config.getString("my.message")).isEqualTo("hello")
+        val password = config["password"]
+        assertThat(password.secret).isTrue()
+        assertThat(password.value).isEqualTo("hunter2")
+    }
+
 }
