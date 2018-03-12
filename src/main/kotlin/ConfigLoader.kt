@@ -9,7 +9,7 @@ class ConfigLoader {
     internal fun load(): Config {
         val map = mutableMapOf<String, Property>()
         delegates.forEach { it(map) }
-        return Config(map.toSortedMap())
+        return ConfigImpl(map.toSortedMap())
     }
 }
 

@@ -1,11 +1,16 @@
 package org.pyrhus.config
 
-data class Config(private val map: Map<String, Property>) {
-    operator fun get(key: String): Property {
+interface Config {
+    operator fun get(key: String): Property
+    operator fun contains(key: String): Boolean
+}
+
+internal data class ConfigImpl(private val map: Map<String, Property>) : Config {
+    override operator fun get(key: String): Property {
         return map[key] ?: throw ConfigException("Configuration key '$key' not found")
     }
 
-    operator fun contains(key: String) = key in map
+    override operator fun contains(key: String) = key in map
 
     override fun toString(): String {
         val sb = StringBuilder()
