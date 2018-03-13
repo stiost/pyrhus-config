@@ -1,5 +1,7 @@
 package org.pyrhus.config
 
+import org.slf4j.*
+
 class ConfigLoader {
     private val delegates = mutableListOf<MapWriter>()
 
@@ -26,24 +28,27 @@ typealias ConfigSource = (ConfigWriter) -> Unit
 private typealias MapWriter = (MutableMap<String, Property>) -> Unit
 
 private class Writer(val map: MutableMap<String, Property>, val override: Boolean) : ConfigWriter {
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
 
     override fun submit(property: Property) {
-        val processed = process(property, map[property.key])
-        if (processed != null) map[processed.key] = processed
-    }
-
-    private fun process(property: Property, oldProperty: Property?): Property? {
+        val oldProperty = map[property.key]
         if (oldProperty == null) {
-            if (override) return null
-        } else if (oldProperty.secret) {
-            return property.asSecret()
+            if (override) {
+                log.debug("discard {}", property)
+                return
+            }
+            log.debug("add {}", property)
+            map[property.key] = property
+        } else {
+            log.debug("override {} -> {}", oldProperty, property)
+            map[property.key] = if (oldProperty.secret) property.asSecret() else property
         }
-        return property
     }
 
     override fun submit(key: String?, value: String?, secret: Boolean) {
-        if (key != null && value != null) {
-            submit(Property(key, value, secret))
+        if (key != null) {
+            submit(Property(key, value?.trimIndent(), secret))
         }
     }
 
