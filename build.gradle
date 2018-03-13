@@ -1,5 +1,6 @@
 plugins {
   id "org.jetbrains.kotlin.jvm" version "1.2.30"
+  id "com.jfrog.bintray" version "1.7.3"
 }
 apply plugin: "java-library"
 apply plugin: "maven-publish"
@@ -26,7 +27,7 @@ task sourceJar(type: Jar) {
 
 publishing {
   publications {
-    mavenJava(MavenPublication) {
+    bintray(MavenPublication) {
       from components.java
 
       artifact sourceJar {
@@ -34,4 +35,14 @@ publishing {
       }
     }
   }
+}
+
+bintray {
+  user = pyrhusBintrayUser
+  key = pyrhusBintrayKey
+  pkg {
+    repo = "pyrhus"
+    name = "pyrhus-config"
+  }
+  publications = ["bintray"]
 }
