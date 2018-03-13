@@ -73,10 +73,10 @@ class ConfigLoaderTest {
         val config = loadConfig {
         }
         assertThat("message" in config).isFalse()
-
         assertThatThrownBy { config["message"] }
             .hasMessage("Configuration key 'message' not found")
             .isInstanceOf(ConfigException::class.java)
+        assertThat(config.getOrNull("message")).isNull()
     }
 
     @Test
@@ -88,6 +88,8 @@ class ConfigLoaderTest {
         val password = config["password"]
         assertThat(password.secret).isTrue()
         assertThat(password.value).isEqualTo("hunter2")
+        assertThatThrownBy { config.getString("empty") }.hasMessage("Property 'empty' has no value")
+        assertThatThrownBy { config.getString("whitespace") }.hasMessage("Property 'whitespace' has no value")
     }
 
     @Test
@@ -99,6 +101,15 @@ class ConfigLoaderTest {
         val password = config["password"]
         assertThat(password.secret).isTrue()
         assertThat(password.value).isEqualTo("hunter2")
+    }
+
+    @Test
+    fun testEmptyValue() {
+        val config = loadConfig {
+            add(Property("empty", null))
+        }
+        assertThat(config["empty"]).isEqualTo(Property("empty", null))
+        assertThatThrownBy { config.getString("empty") }.hasMessage("Property 'empty' has no value")
     }
 
 }
