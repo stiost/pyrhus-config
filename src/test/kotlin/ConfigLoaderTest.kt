@@ -88,8 +88,8 @@ class ConfigLoaderTest {
         val password = config["password"]
         assertThat(password.secret).isTrue()
         assertThat(password.value).isEqualTo("hunter2")
-        assertThatThrownBy { config.getString("empty") }.hasMessage("Property 'empty' has no value")
-        assertThatThrownBy { config.getString("whitespace") }.hasMessage("Property 'whitespace' has no value")
+        assertThatThrownBy { config.getString("empty") }.hasMessage("Required key 'empty' has no value")
+        assertThatThrownBy { config.getString("whitespace") }.hasMessage("Required key 'whitespace' has no value")
     }
 
     @Test
@@ -106,10 +106,14 @@ class ConfigLoaderTest {
     @Test
     fun testEmptyValue() {
         val config = loadConfig {
-            add(Property("empty", null))
+            add(property("empty", null))
+            add(property("empty2", ""))
         }
-        assertThat(config["empty"]).isEqualTo(Property("empty", null))
-        assertThatThrownBy { config.getString("empty") }.hasMessage("Property 'empty' has no value")
+        assertThatThrownBy { config["empty"] }.hasMessage("Required key 'empty' has no value")
+        assertThatThrownBy { config.getString("empty") }.hasMessage("Required key 'empty' has no value")
+        val property = config.getOrNull("empty")!!
+        assertThat(property).isEqualTo(Property("empty", null))
+        assertThatThrownBy { property.asString() }.hasMessage("Property 'empty' has no value")
     }
 
 }

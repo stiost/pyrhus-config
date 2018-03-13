@@ -4,7 +4,7 @@ import java.nio.charset.*
 import java.nio.file.*
 import java.util.*
 
-fun property(name: String, value: String, secret: Boolean = false): ConfigSource {
+fun property(name: String, value: String?, secret: Boolean = false): ConfigSource {
     return { writer -> writer.submit(Property(name, value, secret)) }
 }
 

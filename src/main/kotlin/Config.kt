@@ -8,7 +8,9 @@ interface Config {
 
 internal data class ConfigImpl(private val map: Map<String, Property>) : Config {
     override operator fun get(key: String): Property {
-        return map[key] ?: throw ConfigException("Configuration key '$key' not found")
+        val property = map[key] ?: throw ConfigException("Configuration key '$key' not found")
+        if (property.value == null) throw ConfigException("Required key '$key' has no value")
+        return property
     }
 
     override fun getOrNull(key: String): Property? {
