@@ -1,6 +1,6 @@
 package org.pyrhus.config
 
-interface Config {
+interface Config : Iterable<Property> {
     operator fun get(key: String): Property
     fun getOrNull(key: String): Property?
     operator fun contains(key: String): Boolean
@@ -13,11 +13,11 @@ internal data class ConfigImpl(private val map: Map<String, Property>) : Config 
         return property
     }
 
-    override fun getOrNull(key: String): Property? {
-        return map[key]
-    }
+    override fun getOrNull(key: String): Property? = map[key]
 
     override operator fun contains(key: String) = key in map
+
+    override fun iterator(): Iterator<Property> = map.values.iterator()
 
     override fun toString(): String {
         val sb = StringBuilder()
@@ -29,13 +29,8 @@ internal data class ConfigImpl(private val map: Map<String, Property>) : Config 
 }
 
 data class Property(val key: String, val value: String?, val secret: Boolean = false) {
-    override fun toString(): String {
-        return "$key = ${if (secret) "********" else this.value}"
-    }
-
-    internal fun asSecret(): Property {
-        return if (secret) this else this.copy(secret = true)
-    }
+    override fun toString(): String = "$key = ${if (secret) "********" else this.value}"
+    internal fun asSecret(): Property = if (secret) this else this.copy(secret = true)
 }
 
 class ConfigException(message: String) : Exception(message)
