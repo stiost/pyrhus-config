@@ -35,13 +35,18 @@ fun propertiesResource(classpath: String): ConfigSource {
     }
 }
 
-fun propertiesFile(file: String) = propertiesFile(Paths.get(file))
+fun propertiesFile(file: String, failOnMissing: Boolean = true) = propertiesFile(Paths.get(file), failOnMissing)
 
-fun propertiesFile(file: Path): ConfigSource {
+fun propertiesFile(file: Path, failOnMissing: Boolean = true): ConfigSource {
     val opener = { Files.newBufferedReader(file, StandardCharsets.UTF_8) }
     return { writer ->
         ConfigLoader.log.info("loading properties from file $file")
-        PropertiesReader(opener).read(writer)
+        try {
+            PropertiesReader(opener).read(writer)
+        } catch (e: NoSuchFileException) {
+            if (failOnMissing) throw e
+            ConfigLoader.log.info("unable to find properties file $file")
+        }
     }
 }
 

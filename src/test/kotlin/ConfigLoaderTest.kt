@@ -104,6 +104,13 @@ class ConfigLoaderTest {
     }
 
     @Test
+    fun testLoadMissingPropertiesFile() {
+        loadConfig {
+            add(propertiesFile("doesnotexist.properties", failOnMissing = false))
+        }
+    }
+
+    @Test
     fun testEmptyValue() {
         val config = loadConfig {
             add(property("empty", null))
