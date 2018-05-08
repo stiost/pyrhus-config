@@ -3,6 +3,10 @@ package org.pyrhus.config
 import org.slf4j.*
 
 class ConfigLoader {
+    companion object {
+        internal val log = LoggerFactory.getLogger(ConfigLoader::class.java)
+    }
+
     private val delegates = mutableListOf<MapWriter>()
 
     fun add(source: ConfigSource) = delegates.add({ map -> source(Writer(map, false)) })
@@ -29,7 +33,6 @@ private typealias MapWriter = (MutableMap<String, Property>) -> Unit
 
 private class Writer(val map: MutableMap<String, Property>, val override: Boolean) : ConfigWriter {
     private val log = LoggerFactory.getLogger(this.javaClass)
-
 
     override fun submit(property: Property) {
         val oldProperty = map[property.key]

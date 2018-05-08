@@ -10,6 +10,7 @@ fun property(name: String, value: String?, secret: Boolean = false): ConfigSourc
 
 fun env(map: Map<String, String> = System.getenv()): ConfigSource {
     return { writer ->
+        ConfigLoader.log.info("loading properties from env")
         for ((envKey, value) in map) {
             val key = envKey.toLowerCase().replace("_", ".")
             writer.submit(key, value)
@@ -19,6 +20,7 @@ fun env(map: Map<String, String> = System.getenv()): ConfigSource {
 
 fun sysProps(properties: Properties = System.getProperties()): ConfigSource {
     return { writer ->
+        ConfigLoader.log.info("loading properties from system properties")
         for ((key, value) in properties) {
             if (key as? String != null && value as? String != null) writer.submit(key, value)
         }
@@ -27,14 +29,20 @@ fun sysProps(properties: Properties = System.getProperties()): ConfigSource {
 
 fun propertiesResource(classpath: String): ConfigSource {
     val opener = resourceOpener(classpath)
-    return { writer -> PropertiesReader(opener).read(writer) }
+    return { writer ->
+        ConfigLoader.log.info("loading properties from resource $classpath")
+        PropertiesReader(opener).read(writer)
+    }
 }
 
 fun propertiesFile(file: String) = propertiesFile(Paths.get(file))
 
 fun propertiesFile(file: Path): ConfigSource {
     val opener = { Files.newBufferedReader(file, StandardCharsets.UTF_8) }
-    return { writer -> PropertiesReader(opener).read(writer) }
+    return { writer ->
+        ConfigLoader.log.info("loading properties from file $file")
+        PropertiesReader(opener).read(writer)
+    }
 }
 
 class PropertiesReader(private val opener: ReaderOpener) {
