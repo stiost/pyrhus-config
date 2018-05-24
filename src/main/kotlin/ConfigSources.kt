@@ -68,3 +68,39 @@ class PropertiesReader(private val opener: ReaderOpener) {
         }
     }
 }
+
+fun iniFile(file: String, failOnMissing: Boolean = true): ConfigSource {
+    val opener = { Files.newBufferedReader(Paths.get(file), StandardCharsets.UTF_8) }
+    return { writer ->
+        ConfigLoader.log.info("loading properties from file $file")
+        try {
+            IniReader(opener).read(writer)
+        } catch (e: NoSuchFileException) {
+            if (failOnMissing) throw e
+            ConfigLoader.log.info("unable to find properties file $file")
+        }
+    }
+}
+
+class IniReader(private val opener: ReaderOpener) {
+    fun read(writer: ConfigWriter) {
+        opener().use { reader ->
+            var header = ""
+            for (line in reader.readLines()) {
+                if (line.isEmpty()) {
+                    continue
+                } else if (line.startsWith("[")) {
+                    header = line.trim('[', ']') + "."
+                } else if (line.startsWith("#")) {
+                    continue
+                } else {
+                    val i = line.indexOf('=')
+                    if (i == -1) continue
+                    val key = header + line.substring(0, i)
+                    val value = line.substring(i + 1).takeIf { !it.isNullOrBlank() }
+                    writer.submit(key, value)
+                }
+            }
+        }
+    }
+}

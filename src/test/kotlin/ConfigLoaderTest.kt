@@ -123,4 +123,16 @@ class ConfigLoaderTest {
         assertThatThrownBy { property.asString() }.hasMessage("Property 'empty' has no value")
     }
 
+    @Test
+    fun testLoadConfFile() {
+        val config = loadConfig {
+            add(iniFile("src/test/resources/test.conf"))
+        }
+        assertThat(config.getString("myapp.message")).isEqualTo("hello")
+        assertThat(config.getOrNull("myapp.empty")!!.value).isNull()
+        assertThat(config.getOrNull("myapp.whitespace")!!.value).isNull()
+        assertThat(config["common.database"].value).isEqualTo("postgres")
+        assertThat(config["stuff"].value).isEqualTo("value")
+    }
+
 }
